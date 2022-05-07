@@ -1,0 +1,6 @@
+imię nazwisko wiek wzrost płeć
+Adam Wyszyński 25 182 M
+Antoni Łukaszenko 22 175 M
+Barbara Kowalska 32 165 K
+Zbigniew Karwowski 45 180 M
+Joanna Krasińska 35 178 K
