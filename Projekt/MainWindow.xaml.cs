@@ -1,7 +1,10 @@
-﻿using Microsoft.Win32;
+﻿using CsvHelper;
+using CsvHelper.Configuration;
+using Microsoft.Win32;
 using Projekt.Models;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -23,54 +26,77 @@ namespace Projekt
     /// </summary>
     public partial class MainWindow : Window
     {
-        private List<Property> properties;
+        private IEnumerable<dynamic> csvData;
 
         public MainWindow()
         {
+            this.DataContext = csvData;
             InitializeComponent();
-            properties = new List<Property>();
         }
 
-        private void LoadTxtFileButton_MouseUp(object sender, MouseButtonEventArgs e)
+        private void LoadFileButton_Click(object sender, RoutedEventArgs e)
         {
-            List<string> readText;
-
-            OpenFileDialog openFileDialog = new OpenFileDialog();
-            if (openFileDialog.ShowDialog() == true)
+            var csvConfiguration = new CsvConfiguration(CultureInfo.InvariantCulture)
             {
-                readText = File.ReadAllLines(openFileDialog.FileName).ToList();
-            }
-            else
+                Delimiter = ",",
+                HasHeaderRecord = true,
+                IgnoreBlankLines = true,
+                DetectColumnCountChanges = true,
+                BadDataFound = null,
+                WhiteSpaceChars = new char[] { ' ', '\t' },
+                TrimOptions = TrimOptions.Trim,
+            };
+
+            using (var reader = new StreamReader("D:\\Studia mgr\\Obliczenia naukowe\\4\\cities.csv"))
+            using (var csv = new CsvReader(reader, csvConfiguration))
             {
-                throw new Exception("Could not open file dialog");
+                csvData = csv
+                    .GetRecords<dynamic>()
+                    .Select(r => new List<KeyValuePair<string, object>>(r))
+                    .ToList();
+
+                IEnumerable<KeyValuePair<string, object>> xd = csvData.First();
+                var list = new List<object>() { xd.First().Value, 65 };
+
+                StringBuilder message = new StringBuilder();
+
+                //foreach (var xd in csvData)
+                //{
+                //    IEnumerable<KeyValuePair<string, object>> xa = xd;
+                //    var x = xa.ToList();
+                //    foreach (var d in x)
+                //    {
+                //        message.Append($"{d.Key} - {d.Value}\n");
+                //    }
+
+                //    MessageBox.Show(message.ToString(), "Yee boi", MessageBoxButton.OK);
+
+                //}
+
+
+
+                //csv.Read();
+                //csv.ReadHeader();
+                //while (csv.Read())
+                //{
+                //    var record = csv.GetRecord<dynamic>();
+                //    var x = record.GetType();
+                //    foreach (var v in x as IDictionary<string, object>)
+                //    {
+                //        string key = v.Key;
+                //        object value = v.Value;
+                //    }
+                //    // Do something with the record.
+                //}
+
+                dataGrid.ItemsSource = new List<object> { 1 };
             }
 
-            bool headerWasRead = false;
-            foreach (string line in readText)
-            {
-                if (line[0] == '#')
-                {
-                    continue;
-                }
-                else if (!headerWasRead)
-                {
-                    string[] headers = line.Split(' ');
-                    properties.AddRange(headers.Select(h => new Property(h)));
+        }
 
-                    headerWasRead = true;
-                }
-                else
-                {
-                    string[] values = line.Split(' ');
-                    for(int i = 0; i < properties.Count; i++)
-                    {
-                        properties[i].Values.Add(values[i]);
-                    }
-                }
-            }
+        private void SaveFileButton_Click(object sender, RoutedEventArgs e)
+        {
 
-            var x = 0;
-                
         }
     }
 }
