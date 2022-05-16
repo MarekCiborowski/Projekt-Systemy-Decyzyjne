@@ -2,8 +2,10 @@
 using CsvHelper.Configuration;
 using Microsoft.Win32;
 using Projekt.Models;
+using Projekt.Utils;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -11,6 +13,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
@@ -26,7 +29,11 @@ namespace Projekt
     /// </summary>
     public partial class MainWindow : Window
     {
-        private IEnumerable<dynamic> csvData;
+        // pierwsza lista - lista wszystkich rekordów
+        // druga lista - lista wartości(kolumn) danego rekordu
+        // para klucz wartość - połączenie nazwy kolumny z wartością pojedynczego rekordu
+        private List<List<KeyValuePair<string, object>>> csvData;
+        private DataTableHelper dataTableHelper = new DataTableHelper();
 
         public MainWindow()
         {
@@ -36,7 +43,26 @@ namespace Projekt
 
         private void LoadFileButton_Click(object sender, RoutedEventArgs e)
         {
-            var csvConfiguration = new CsvConfiguration(CultureInfo.InvariantCulture)
+            OpenFileDialog fileDialog = new();
+            fileDialog.Filter = "CSV files(*.csv; )|*.csv;" + "|All files (*.*)|*.*";
+            fileDialog.CheckFileExists = true;
+            fileDialog.Multiselect = false;
+
+            if (fileDialog.ShowDialog() == true)
+            {
+                try
+                {
+                    string path = new Uri(fileDialog.FileName).AbsolutePath.Replace("%20", " ");
+                    FilePathTextBox.Text = path;
+
+                }
+                catch (Exception exc)
+                {
+                    _ = MessageBox.Show(exc.Message);
+                }
+            }
+
+            CsvConfiguration csvConfiguration = new CsvConfiguration(CultureInfo.InvariantCulture)
             {
                 Delimiter = ",",
                 HasHeaderRecord = true,
@@ -47,56 +73,58 @@ namespace Projekt
                 TrimOptions = TrimOptions.Trim,
             };
 
-            using (var reader = new StreamReader("D:\\Studia mgr\\Obliczenia naukowe\\4\\cities.csv"))
-            using (var csv = new CsvReader(reader, csvConfiguration))
+            using (StreamReader reader = new StreamReader(FilePathTextBox.Text))
+            using (CsvReader csv = new CsvReader(reader, csvConfiguration))
             {
                 csvData = csv
                     .GetRecords<dynamic>()
                     .Select(r => new List<KeyValuePair<string, object>>(r))
                     .ToList();
 
-                IEnumerable<KeyValuePair<string, object>> xd = csvData.First();
-                var list = new List<object>() { xd.First().Value, 65 };
-
-                StringBuilder message = new StringBuilder();
-
-                //foreach (var xd in csvData)
-                //{
-                //    IEnumerable<KeyValuePair<string, object>> xa = xd;
-                //    var x = xa.ToList();
-                //    foreach (var d in x)
-                //    {
-                //        message.Append($"{d.Key} - {d.Value}\n");
-                //    }
-
-                //    MessageBox.Show(message.ToString(), "Yee boi", MessageBoxButton.OK);
-
-                //}
-
-
-
-                //csv.Read();
-                //csv.ReadHeader();
-                //while (csv.Read())
-                //{
-                //    var record = csv.GetRecord<dynamic>();
-                //    var x = record.GetType();
-                //    foreach (var v in x as IDictionary<string, object>)
-                //    {
-                //        string key = v.Key;
-                //        object value = v.Value;
-                //    }
-                //    // Do something with the record.
-                //}
-
-                dataGrid.ItemsSource = new List<object> { 1 };
+                dataGrid.ItemsSource = dataTableHelper.GetDataTableFromCsvData(csvData).DefaultView;
             }
-
         }
+
 
         private void SaveFileButton_Click(object sender, RoutedEventArgs e)
         {
 
         }
+
+        private void dataGrid_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
+        {
+            int rowIndex = ((DataGrid)sender).ItemContainerGenerator.IndexFromContainer(e.Row);
+            int colIndex = e.Column.DisplayIndex;
+            var newValue = ((TextBox)e.EditingElement).Text;
+            dataGrid.ItemsSource = dataTableHelper.UpdateDataTable(rowIndex, colIndex, newValue).DefaultView;
+        }
+
+        private void ChangeTextToNumber_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+
+        private T GetVisualParent<T>(DependencyObject child) where T : Visual
+        {
+            DependencyObject parent = VisualTreeHelper.GetParent(child);
+            if (parent == null || parent is T)
+            {
+                return parent as T;
+            }
+            else
+            {
+                return GetVisualParent<T>(parent);
+            }
+        }
+
+        private void dataGrid_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            DataGridColumnHeader dataGridColumnHeader = GetVisualParent<DataGridColumnHeader>(e.OriginalSource as DependencyObject);
+            if (dataGridColumnHeader == null)
+            {
+                return;
+            }
+        }
     }
-}
+} 

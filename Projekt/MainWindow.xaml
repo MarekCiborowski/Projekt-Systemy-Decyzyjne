@@ -5,11 +5,13 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Projekt"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Grid Name="MainGrid" Height="450" Width="800" Background="Transparent">
+        Title="MainWindow" Height="960" Width="1920">
+    <Grid Name="MainGrid" Height="960" Width="1920" Background="Transparent">
         <Button Content="Load csv file" HorizontalAlignment="Left" Margin="30,10,0,0" VerticalAlignment="Top" Click="LoadFileButton_Click"/>
-        <Button Content="Load csv file" HorizontalAlignment="Left" Margin="115,10,0,0" VerticalAlignment="Top" Click="SaveFileButton_Click"/>
-        <DataGrid Name="dataGrid" ItemsSource="{Binding DataGridItems}" AutoGenerateColumns="True" Margin="30,74,200,74"/>
+        <Button Content="Save csv file" HorizontalAlignment="Left" Margin="115,10,0,0" VerticalAlignment="Top" Click="SaveFileButton_Click"/>
+        <DataGrid Name="dataGrid" Mouse.PreviewMouseDown="dataGrid_PreviewMouseDown" SelectionUnit="Cell" CanUserSortColumns="False" ItemsSource="{Binding DataGridItems}" CellEditEnding="dataGrid_CellEditEnding" AutoGenerateColumns="True" Margin="30,74,601,226"/>
+        <TextBox Name="FilePathTextBox" HorizontalAlignment="Left" Margin="231,12,0,0" VerticalAlignment="Top" Width="323" />
+        <Button Content="Change text to number" HorizontalAlignment="Left" Margin="1359,74,0,0" VerticalAlignment="Top" Click="ChangeTextToNumber_Click"/>
 
     </Grid>
 </Window>
