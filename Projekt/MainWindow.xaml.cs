@@ -101,7 +101,15 @@ namespace Projekt
 
         private void ChangeTextToNumber_Click(object sender, RoutedEventArgs e)
         {
+            OneColumnChoice oneColumnChoice = new OneColumnChoice(dataTableHelper.GetColumnsNames());
+            string selectedColumn = string.Empty;
+            if(oneColumnChoice.ShowDialog() == true)
+            {
+                selectedColumn = oneColumnChoice.result;
+            }
 
+            dataGrid.ItemsSource = null;
+            dataGrid.ItemsSource = dataTableHelper.AddNewTextToNumberColumn(selectedColumn).DefaultView;
         }
 
 

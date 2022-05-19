@@ -9,9 +9,11 @@
     <Grid Name="MainGrid" Height="960" Width="1920" Background="Transparent">
         <Button Content="Load csv file" HorizontalAlignment="Left" Margin="30,10,0,0" VerticalAlignment="Top" Click="LoadFileButton_Click"/>
         <Button Content="Save csv file" HorizontalAlignment="Left" Margin="115,10,0,0" VerticalAlignment="Top" Click="SaveFileButton_Click"/>
-        <DataGrid Name="dataGrid" Mouse.PreviewMouseDown="dataGrid_PreviewMouseDown" SelectionUnit="Cell" CanUserSortColumns="False" ItemsSource="{Binding DataGridItems}" CellEditEnding="dataGrid_CellEditEnding" AutoGenerateColumns="True" Margin="30,74,601,226"/>
+        <DataGrid Name="dataGrid" Mouse.PreviewMouseDown="dataGrid_PreviewMouseDown" SelectionUnit="CellOrRowHeader" CanUserSortColumns="False" ItemsSource="{Binding DataGridItems}" CellEditEnding="dataGrid_CellEditEnding" AutoGenerateColumns="True" Margin="30,74,601,226"/>
         <TextBox Name="FilePathTextBox" HorizontalAlignment="Left" Margin="231,12,0,0" VerticalAlignment="Top" Width="323" />
-        <Button Content="Change text to number" HorizontalAlignment="Left" Margin="1359,74,0,0" VerticalAlignment="Top" Click="ChangeTextToNumber_Click"/>
 
+        <StackPanel Margin="1359,74,400,0">
+            <Button Content="Change text to number" HorizontalAlignment="Left"  VerticalAlignment="Top" Click="ChangeTextToNumber_Click"/>
+        </StackPanel>
     </Grid>
 </Window>
