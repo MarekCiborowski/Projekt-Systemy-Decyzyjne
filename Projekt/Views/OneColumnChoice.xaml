@@ -5,8 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Projekt"
         mc:Ignorable="d"
-        Title="Change Text To Number" Height="400" Width="400">
-    <Grid Name="MainGrid" Height="400" Background="Transparent">
+        Title="Select column" Height="400" Width="400">
+    <Grid >
         <ListBox  Name="listBox" Margin="116,17,113,187"/>
         <Button Content="Confirm" HorizontalAlignment="Center" Margin="0,342,0,0" VerticalAlignment="Top" Click="Button_Click"/>
 

@@ -3,6 +3,7 @@ using CsvHelper.Configuration;
 using Microsoft.Win32;
 using Projekt.Models;
 using Projekt.Utils;
+using Projekt.Views;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -110,6 +111,34 @@ namespace Projekt
 
             dataGrid.ItemsSource = null;
             dataGrid.ItemsSource = dataTableHelper.AddNewTextToNumberColumn(selectedColumn).DefaultView;
+        }
+
+        private void Discretize_Click(object sender, RoutedEventArgs e)
+        {
+            OneColumnChoice oneColumnChoice = new OneColumnChoice(dataTableHelper.GetColumnsNames());
+            string selectedColumn = string.Empty;
+            if (oneColumnChoice.ShowDialog() == true)
+            {
+                selectedColumn = oneColumnChoice.result;
+            }
+
+            GetNumberFromUser getNumberFromUser = new GetNumberFromUser("Enter number of bins");
+            int numberOfBins = 0;
+            if (getNumberFromUser.ShowDialog() == true)
+            {
+                numberOfBins = (int)getNumberFromUser.result;
+            }
+
+            dataGrid.ItemsSource = null;
+            try
+            {
+                dataGrid.ItemsSource = dataTableHelper.DiscretizeColumn(selectedColumn, numberOfBins).DefaultView;
+            }
+            catch (ArgumentException)
+            {
+                MessageBox.Show("Cannot discretize string value");
+                dataGrid.ItemsSource = dataTableHelper.GetDataTable().DefaultView;
+            }
         }
 
 

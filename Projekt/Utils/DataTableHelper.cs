@@ -14,6 +14,11 @@ namespace Projekt.Utils
 
         private int getHighestColumnIndex => columnNamesIndexes.Values.Max();
 
+        public DataTable GetDataTable()
+        {
+            return _dataTable;
+        }
+
         public DataTable GetDataTableFromCsvData(List<List<KeyValuePair<string,object>>> csvData)
         {
             DataTable data = new();
@@ -84,7 +89,47 @@ namespace Projekt.Utils
                 }
 
                 _dataTable.Rows[rowIndex++][newColumnIndex] = dict[textValue];
+            }
 
+            return _dataTable;
+        }
+
+        public DataTable DiscretizeColumn(string columnName, int numberOfBins)
+        {
+            if (string.IsNullOrEmpty(columnName))
+            {
+                return _dataTable;
+            }
+
+            var columnIndex = columnNamesIndexes[columnName];
+            if (!float.TryParse(_dataTable.Rows[0][columnIndex].ToString(), out _))
+            {
+                throw new ArgumentException();
+            }
+
+            var newColumnName = $"{columnName}-Discretized";
+            var newColumnIndex = getHighestColumnIndex + 1;
+            columnNamesIndexes.Add(newColumnName, newColumnIndex);
+
+            var floatValues = _dataTable.AsEnumerable()
+                .Select(r => r.Field<string>(columnName))
+                .Select(r => float.Parse(r))
+                .ToList();
+
+            _dataTable.Columns.Add(newColumnName);
+
+            var minValue = floatValues.Min();
+            var maxValue = floatValues.Max();
+            var width = (maxValue - minValue) / numberOfBins;
+
+            int rowIndex = 0;
+            foreach (var floatValue in floatValues)
+            {
+                int newValue = floatValue == maxValue
+                    ? numberOfBins // maksymalna wartość
+                    : (int)((floatValue - minValue) / width) + 1;
+
+                _dataTable.Rows[rowIndex++][newColumnIndex] = newValue;
             }
 
             return _dataTable;
