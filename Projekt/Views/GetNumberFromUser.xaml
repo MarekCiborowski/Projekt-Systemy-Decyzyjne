@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Projekt.Views"
         mc:Ignorable="d"
-        Title="--" Height="200" Width="200">
+        Title="--" Height="200" Width="400">
     <Grid Name="MainGrid" Height="200" Background="Transparent">
         <Button Content="Confirm" HorizontalAlignment="Center" Margin="0,100,0,0" VerticalAlignment="Top" Click="Button_Click"/>
         <TextBox Name="TextBox" HorizontalAlignment="Center" Margin="0,50,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>

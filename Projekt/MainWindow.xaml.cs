@@ -141,26 +141,60 @@ namespace Projekt
             }
         }
 
-
-        private T GetVisualParent<T>(DependencyObject child) where T : Visual
+        private void Standardize_Click(object sender, RoutedEventArgs e)
         {
-            DependencyObject parent = VisualTreeHelper.GetParent(child);
-            if (parent == null || parent is T)
+            OneColumnChoice oneColumnChoice = new OneColumnChoice(dataTableHelper.GetColumnsNames());
+            string selectedColumn = string.Empty;
+            if (oneColumnChoice.ShowDialog() == true)
             {
-                return parent as T;
+                selectedColumn = oneColumnChoice.result;
             }
-            else
+
+            dataGrid.ItemsSource = null;
+            try
             {
-                return GetVisualParent<T>(parent);
+                dataGrid.ItemsSource = dataTableHelper.StandardizeColumn(selectedColumn).DefaultView;
+            }
+            catch (ArgumentException)
+            {
+                MessageBox.Show("Cannot standardize string value");
+                dataGrid.ItemsSource = dataTableHelper.GetDataTable().DefaultView;
             }
         }
 
-        private void dataGrid_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+
+        private void ScaleRange_Click(object sender, RoutedEventArgs e)
         {
-            DataGridColumnHeader dataGridColumnHeader = GetVisualParent<DataGridColumnHeader>(e.OriginalSource as DependencyObject);
-            if (dataGridColumnHeader == null)
+            OneColumnChoice oneColumnChoice = new OneColumnChoice(dataTableHelper.GetColumnsNames());
+            string selectedColumn = string.Empty;
+            if (oneColumnChoice.ShowDialog() == true)
             {
-                return;
+                selectedColumn = oneColumnChoice.result;
+            }
+
+            GetNumberFromUser getNewMinimumFromUser = new GetNumberFromUser("Enter new minimal value");
+            float minValue = 0;
+            if (getNewMinimumFromUser.ShowDialog() == true)
+            {
+                minValue = getNewMinimumFromUser.result;
+            }
+
+            GetNumberFromUser getNewMaximumFromUser = new GetNumberFromUser("Enter new maximum value");
+            float maxValue = 0;
+            if (getNewMaximumFromUser.ShowDialog() == true)
+            {
+                maxValue = getNewMaximumFromUser.result;
+            }
+
+            dataGrid.ItemsSource = null;
+            try
+            {
+                dataGrid.ItemsSource = dataTableHelper.ScaleRangeOfColumn(selectedColumn, minValue, maxValue).DefaultView;
+            }
+            catch (ArgumentException)
+            {
+                MessageBox.Show("Cannot change range of string value");
+                dataGrid.ItemsSource = dataTableHelper.GetDataTable().DefaultView;
             }
         }
     }

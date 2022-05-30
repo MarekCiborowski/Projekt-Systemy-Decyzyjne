@@ -134,5 +134,81 @@ namespace Projekt.Utils
 
             return _dataTable;
         }
+
+        public DataTable StandardizeColumn(string columnName)
+        {
+            if (string.IsNullOrEmpty(columnName))
+            {
+                return _dataTable;
+            }
+
+            var columnIndex = columnNamesIndexes[columnName];
+            if (!float.TryParse(_dataTable.Rows[0][columnIndex].ToString(), out _))
+            {
+                throw new ArgumentException();
+            }
+
+            var newColumnName = $"{columnName}-Standardized";
+            var newColumnIndex = getHighestColumnIndex + 1;
+            columnNamesIndexes.Add(newColumnName, newColumnIndex);
+
+            var floatValues = _dataTable.AsEnumerable()
+                .Select(r => r.Field<string>(columnName))
+                .Select(r => float.Parse(r))
+                .ToList();
+
+            _dataTable.Columns.Add(newColumnName);
+
+            var averageValue = floatValues.Average();
+            var standardDeviation = floatValues.StdDev();
+
+            int rowIndex = 0;
+            foreach (var floatValue in floatValues)
+            {
+                float newValue = (floatValue - averageValue) / standardDeviation;
+
+                _dataTable.Rows[rowIndex++][newColumnIndex] = newValue;
+            }
+
+            return _dataTable;
+        }
+
+        public DataTable ScaleRangeOfColumn(string columnName, float newMinValue, float newMaxValue)
+        {
+            if (string.IsNullOrEmpty(columnName))
+            {
+                return _dataTable;
+            }
+
+            var columnIndex = columnNamesIndexes[columnName];
+            if (!float.TryParse(_dataTable.Rows[0][columnIndex].ToString(), out _))
+            {
+                throw new ArgumentException();
+            }
+
+            var newColumnName = $"{columnName}_Scaled_{newMinValue}-{newMaxValue}";
+            var newColumnIndex = getHighestColumnIndex + 1;
+            columnNamesIndexes.Add(newColumnName, newColumnIndex);
+
+            var floatValues = _dataTable.AsEnumerable()
+                .Select(r => r.Field<string>(columnName))
+                .Select(r => float.Parse(r))
+                .ToList();
+
+            _dataTable.Columns.Add(newColumnName);
+
+            var minValue = floatValues.Min();
+            var maxValue = floatValues.Max();
+
+            int rowIndex = 0;
+            foreach (var floatValue in floatValues)
+            {
+                float newValue = ((newMaxValue - newMinValue) / (maxValue - minValue) * (floatValue - minValue)) + newMinValue;
+
+                _dataTable.Rows[rowIndex++][newColumnIndex] = newValue;
+            }
+
+            return _dataTable;
+        }
     }
 }

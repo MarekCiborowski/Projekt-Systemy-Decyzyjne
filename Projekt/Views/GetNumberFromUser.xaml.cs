@@ -21,8 +21,8 @@ namespace Projekt.Views
     {
         public GetNumberFromUser(string title)
         {
-            Title = title;
             InitializeComponent();
+            Title = title;
         }
 
         public float result
