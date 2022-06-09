@@ -55,7 +55,6 @@ namespace Projekt
                 {
                     string path = new Uri(fileDialog.FileName).AbsolutePath.Replace("%20", " ");
                     FilePathTextBox.Text = path;
-
                 }
                 catch (Exception exc)
                 {
@@ -84,12 +83,6 @@ namespace Projekt
 
                 dataGrid.ItemsSource = dataTableHelper.GetDataTableFromCsvData(csvData).DefaultView;
             }
-        }
-
-
-        private void SaveFileButton_Click(object sender, RoutedEventArgs e)
-        {
-
         }
 
         private void dataGrid_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
@@ -196,6 +189,239 @@ namespace Projekt
                 MessageBox.Show("Cannot change range of string value");
                 dataGrid.ItemsSource = dataTableHelper.GetDataTable().DefaultView;
             }
+        }
+
+        private void MaximumValues_Click(object sender, RoutedEventArgs e)
+        {
+            OneColumnChoice oneColumnChoice = new OneColumnChoice(dataTableHelper.GetColumnsNames());
+            string selectedColumn = string.Empty;
+            if (oneColumnChoice.ShowDialog() == true)
+            {
+                selectedColumn = oneColumnChoice.result;
+            }
+
+            GetNumberFromUser getNumberFromUser = new GetNumberFromUser("Enter percentage value");
+            int percentageValue = 0;
+            if (getNumberFromUser.ShowDialog() == true)
+            {
+                percentageValue = (int)getNumberFromUser.result;
+            }
+
+            dataGrid.ItemsSource = null;
+            try
+            {
+                dataGrid.ItemsSource = dataTableHelper.MaximumValues(selectedColumn, percentageValue).DefaultView;
+            }
+            catch (ArgumentException)
+            {
+                MessageBox.Show("Cannot get maximum of string value column");
+                dataGrid.ItemsSource = dataTableHelper.GetDataTable().DefaultView;
+            }
+        }
+
+        private void MinimalValues_Click(object sender, RoutedEventArgs e)
+        {
+            OneColumnChoice oneColumnChoice = new OneColumnChoice(dataTableHelper.GetColumnsNames());
+            string selectedColumn = string.Empty;
+            if (oneColumnChoice.ShowDialog() == true)
+            {
+                selectedColumn = oneColumnChoice.result;
+            }
+
+            GetNumberFromUser getNumberFromUser = new GetNumberFromUser("Enter percentage value");
+            int percentageValue = 0;
+            if (getNumberFromUser.ShowDialog() == true)
+            {
+                percentageValue = (int)getNumberFromUser.result;
+            }
+
+            dataGrid.ItemsSource = null;
+            try
+            {
+                dataGrid.ItemsSource = dataTableHelper.MinimalValues(selectedColumn, percentageValue).DefaultView;
+            }
+            catch (ArgumentException)
+            {
+                MessageBox.Show("Cannot get minimum of string value column");
+                dataGrid.ItemsSource = dataTableHelper.GetDataTable().DefaultView;
+            }
+        }
+
+        private void ExtractTwoDimensionChart_Click(object sender, RoutedEventArgs e)
+        {
+            OneColumnChoice firstColumnChoice = new OneColumnChoice(dataTableHelper.GetColumnsNames());
+            string firstColumn = string.Empty;
+            if (firstColumnChoice.ShowDialog() == true)
+            {
+                firstColumn = firstColumnChoice.result;
+            }
+
+            OneColumnChoice secondColumnChoice = new OneColumnChoice(dataTableHelper.GetColumnsNames());
+            string secondColumn = string.Empty;
+            if (secondColumnChoice.ShowDialog() == true)
+            {
+                secondColumn = secondColumnChoice.result;
+            }
+
+            var firstColumnValues = dataTableHelper.GetAllValuesFromColumn(firstColumn);
+            var secondColumnValues = dataTableHelper.GetAllValuesFromColumn(secondColumn);
+
+            var textToWrite = new List<string>();
+
+            textToWrite.Add($"{firstColumnValues.Count}");
+
+            textToWrite.Add($"{firstColumn}");
+            firstColumnValues.ForEach(f => textToWrite.Add(f.ToString()));
+
+            textToWrite.Add($"{secondColumn}");
+            secondColumnValues.ForEach(s => textToWrite.Add(s.ToString()));
+
+            File.WriteAllLines($"TwoDimensionData_{firstColumn}_{secondColumn}.txt", textToWrite);
+        }
+
+        private void ExtractThreeDimensionChart_Click(object sender, RoutedEventArgs e)
+        {
+            OneColumnChoice firstColumnChoice = new OneColumnChoice(dataTableHelper.GetColumnsNames());
+            string firstColumn = string.Empty;
+            if (firstColumnChoice.ShowDialog() == true)
+            {
+                firstColumn = firstColumnChoice.result;
+            }
+
+            OneColumnChoice secondColumnChoice = new OneColumnChoice(dataTableHelper.GetColumnsNames());
+            string secondColumn = string.Empty;
+            if (secondColumnChoice.ShowDialog() == true)
+            {
+                secondColumn = secondColumnChoice.result;
+            }
+
+            OneColumnChoice thirdColumnChoice = new OneColumnChoice(dataTableHelper.GetColumnsNames());
+            string thirdColumn = string.Empty;
+            if (thirdColumnChoice.ShowDialog() == true)
+            {
+                thirdColumn = thirdColumnChoice.result;
+            }
+
+            var firstColumnValues = dataTableHelper.GetAllValuesFromColumn(firstColumn);
+            var secondColumnValues = dataTableHelper.GetAllValuesFromColumn(secondColumn);
+            var thirdColumnValues = dataTableHelper.GetAllValuesFromColumn(thirdColumn);
+
+            var textToWrite = new List<string>();
+
+            textToWrite.Add($"{firstColumnValues.Count}");
+
+            textToWrite.Add($"{firstColumn}");
+            firstColumnValues.ForEach(f => textToWrite.Add(f.ToString()));
+
+            textToWrite.Add($"{secondColumn}");
+            secondColumnValues.ForEach(s => textToWrite.Add(s.ToString()));
+
+            textToWrite.Add($"{thirdColumn}");
+            thirdColumnValues.ForEach(t => textToWrite.Add(t.ToString()));
+
+            File.WriteAllLines($"ThreeDimensionData_{firstColumn}_{secondColumn}_{thirdColumn}.txt", textToWrite);
+        }
+
+        private class Range
+        {
+            public float MinValue { get; set; }
+
+            public float MaxValue { get; set; }
+
+            public int Count { get; set; }
+        }
+
+        private void ExtractHistogramContinuous_Click(object sender, RoutedEventArgs e)
+        {
+            OneColumnChoice firstColumnChoice = new OneColumnChoice(dataTableHelper.GetColumnsNames());
+            string firstColumn = string.Empty;
+            if (firstColumnChoice.ShowDialog() == true)
+            {
+                firstColumn = firstColumnChoice.result;
+            }
+
+            GetNumberFromUser getNumberFromUser = new GetNumberFromUser("Enter number of ranges");
+            int numberOfRanges = 0;
+            if (getNumberFromUser.ShowDialog() == true)
+            {
+                numberOfRanges = (int)getNumberFromUser.result;
+            }
+
+            var floatValues = dataTableHelper.GetAllValuesFromColumn(firstColumn);
+
+            var minValue = floatValues.Min();
+            var maxValue = floatValues.Max();
+            var width = (maxValue - minValue) / numberOfRanges;
+
+            var maxValueInRange = minValue + width;
+            var minValueInRange = minValue;
+            List<Range> ranges = new List<Range>();
+
+            // przedział domknięty z lewej tylko dla pierwszego zakresu
+            while(minValueInRange < maxValue)
+            {
+                var count = minValueInRange == minValue
+                    ? floatValues.Count(f => f >= minValueInRange && f <= maxValueInRange)
+                    : floatValues.Count(f => f > minValueInRange && f <= maxValueInRange);
+
+                ranges.Add(new Range
+                {
+                    MinValue = minValueInRange,
+                    MaxValue = maxValueInRange,
+                    Count = count
+                });
+
+                minValueInRange += width;
+                maxValueInRange += width;
+            }
+
+            var textToWrite = new List<string>();
+
+            textToWrite.Add($"{firstColumn}");
+            textToWrite.Add($"{ranges.Count}");
+
+            ranges.ForEach(r => textToWrite.Add($"{string.Format("{0:0.00}",r.MinValue)}-{string.Format("{0:0.00}", r.MaxValue)} {r.Count}"));
+
+            File.WriteAllLines($"HistogramContinuousValues_{firstColumn}_{numberOfRanges}_ranges.txt", textToWrite);
+        }
+
+        private class DiscreteHistogramValue
+        {
+            public float Value { get; set; }
+
+            public int Count { get; set; }
+        }
+
+        private void ExtractHistogramDiscrete_Click(object sender, RoutedEventArgs e)
+        {
+            OneColumnChoice firstColumnChoice = new OneColumnChoice(dataTableHelper.GetColumnsNames());
+            string firstColumn = string.Empty;
+            if (firstColumnChoice.ShowDialog() == true)
+            {
+                firstColumn = firstColumnChoice.result;
+            }
+
+            var floatValues = dataTableHelper.GetAllValuesFromColumn(firstColumn);
+            var distinctFloatValues = floatValues.Distinct();
+            List<DiscreteHistogramValue> discreteValues = new List<DiscreteHistogramValue>();
+
+            foreach(var distinctValue in distinctFloatValues)
+            {
+                discreteValues.Add(new DiscreteHistogramValue
+                {
+                    Value = distinctValue,
+                    Count = floatValues.Count(f => f == distinctValue)
+                });
+            }
+
+            var textToWrite = new List<string>();
+
+            textToWrite.Add($"{firstColumn}");
+            textToWrite.Add($"{discreteValues.Count}");
+
+            discreteValues.ForEach(d => textToWrite.Add($"{d.Value} {d.Count}"));
+
+            File.WriteAllLines($"HistogramDiscreteValues_{firstColumn}.txt", textToWrite);
         }
     }
 } 

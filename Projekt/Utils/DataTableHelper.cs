@@ -210,5 +210,88 @@ namespace Projekt.Utils
 
             return _dataTable;
         }
+
+        public DataTable MaximumValues(string columnName, int percentageValue)
+        {
+            if (string.IsNullOrEmpty(columnName))
+            {
+                return _dataTable;
+            }
+
+            var columnIndex = columnNamesIndexes[columnName];
+            if (!float.TryParse(_dataTable.Rows[0][columnIndex].ToString(), out _))
+            {
+                throw new ArgumentException();
+            }
+
+            var newColumnName = $"{columnName}_MaxPercentage_{percentageValue}";
+            var newColumnIndex = getHighestColumnIndex + 1;
+            columnNamesIndexes.Add(newColumnName, newColumnIndex);
+
+            var floatValues = _dataTable.AsEnumerable()
+                .Select(r => r.Field<string>(columnName))
+                .Select(r => float.Parse(r))
+                .OrderByDescending(r => r)
+                .ToList();
+
+            _dataTable.Columns.Add(newColumnName);
+
+            var newColumnCount = floatValues.Count * percentageValue / 100;
+
+            int rowIndex = 0;
+            foreach (var newValue in floatValues.Take(newColumnCount))
+            {
+                _dataTable.Rows[rowIndex++][newColumnIndex] = newValue;
+            }
+
+            return _dataTable;
+        }
+
+        public DataTable MinimalValues(string columnName, int percentageValue)
+        {
+            if (string.IsNullOrEmpty(columnName))
+            {
+                return _dataTable;
+            }
+
+            var columnIndex = columnNamesIndexes[columnName];
+            if (!float.TryParse(_dataTable.Rows[0][columnIndex].ToString(), out _))
+            {
+                throw new ArgumentException();
+            }
+
+            var newColumnName = $"{columnName}_MinPercentage_{percentageValue}";
+            var newColumnIndex = getHighestColumnIndex + 1;
+            columnNamesIndexes.Add(newColumnName, newColumnIndex);
+
+            var floatValues = _dataTable.AsEnumerable()
+                .Select(r => r.Field<string>(columnName))
+                .Select(r => float.Parse(r))
+                .OrderBy(r => r)
+                .ToList();
+
+            _dataTable.Columns.Add(newColumnName);
+
+            var newColumnCount = floatValues.Count * percentageValue / 100;
+
+            int rowIndex = 0;
+            foreach (var newValue in floatValues.Take(newColumnCount))
+            {
+                _dataTable.Rows[rowIndex++][newColumnIndex] = newValue;
+            }
+
+            return _dataTable;
+        }
+
+        public List<float> GetAllValuesFromColumn(string columnName)
+        {
+            var columnIndex = columnNamesIndexes[columnName];
+            var result = _dataTable.AsEnumerable()
+                .Select(r => r.Field<string>(columnName))
+                .Select(r => float.Parse(r))
+                .ToList();
+
+            return result;
+        }
     }
 }

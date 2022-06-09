@@ -8,15 +8,20 @@
         Title="MainWindow" Height="960" Width="1920">
     <Grid Name="MainGrid" Height="960" Width="1920" Background="Transparent">
         <Button Content="Load csv file" HorizontalAlignment="Left" Margin="30,10,0,0" VerticalAlignment="Top" Click="LoadFileButton_Click"/>
-        <Button Content="Save csv file" HorizontalAlignment="Left" Margin="115,10,0,0" VerticalAlignment="Top" Click="SaveFileButton_Click"/>
-        <DataGrid Name="dataGrid" SelectionUnit="CellOrRowHeader" CanUserSortColumns="True" ItemsSource="{Binding DataGridItems}" CellEditEnding="dataGrid_CellEditEnding" AutoGenerateColumns="True" Margin="30,74,601,226"/>
+        <DataGrid Name="dataGrid" SelectionUnit="CellOrRowHeader" CanUserSortColumns="True" ItemsSource="{Binding DataGridItems}" CellEditEnding="dataGrid_CellEditEnding" AutoGenerateColumns="True" Margin="30,74,739,226"/>
         <TextBox Name="FilePathTextBox" HorizontalAlignment="Left" Margin="231,12,0,0" VerticalAlignment="Top" Width="323" />
 
-        <StackPanel Margin="1359,74,400,0">
+        <StackPanel Margin="1204,74,490,0">
             <Button Content="Change text to number" Click="ChangeTextToNumber_Click"/>
             <Button Content="Discretize column" Click="Discretize_Click"/>
             <Button Content="Standardize column" Click="Standardize_Click"/>
             <Button Content="Scale range of column" Click="ScaleRange_Click"/>
+            <Button Content="Extract percentage of minimal values" Click="MinimalValues_Click"/>
+            <Button Content="Extract percentage of maximum values" Click="MaximumValues_Click"/>
+            <Button Content="Extract file for 2D chart" Click="ExtractTwoDimensionChart_Click"/>
+            <Button Content="Extract file for 3D chart" Click="ExtractThreeDimensionChart_Click"/>
+            <Button Content="Extract file for histogram (continous)" Click="ExtractHistogramContinuous_Click"/>
+            <Button Content="Extract file for histogram (discrete)" Click="ExtractHistogramDiscrete_Click"/>
         </StackPanel>
     </Grid>
 </Window>
