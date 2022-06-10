@@ -22,6 +22,8 @@
             <Button Content="Extract file for 3D chart" Click="ExtractThreeDimensionChart_Click"/>
             <Button Content="Extract file for histogram (continous)" Click="ExtractHistogramContinuous_Click"/>
             <Button Content="Extract file for histogram (discrete)" Click="ExtractHistogramDiscrete_Click"/>
+
+            <Button Content="Classification" Click="Classification_Click"/>
         </StackPanel>
     </Grid>
 </Window>

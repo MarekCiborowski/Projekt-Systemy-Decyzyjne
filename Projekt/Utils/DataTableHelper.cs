@@ -37,7 +37,7 @@ namespace Projekt.Utils
             {
                 List<object> valuesList = new List<object>();
 
-                record.ForEach(r => valuesList.Add(r.Value));
+                record.ForEach(r => valuesList.Add((object)r.Value.ToString().Replace('.',',')));
                 _ = data.Rows.Add(valuesList.ToArray());
             }
 

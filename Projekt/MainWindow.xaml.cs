@@ -18,6 +18,7 @@ using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
+using System.Windows.Markup;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
@@ -39,6 +40,9 @@ namespace Projekt
         public MainWindow()
         {
             this.DataContext = csvData;
+            FrameworkElement.LanguageProperty.OverrideMetadata(
+                   typeof(FrameworkElement),
+                   new FrameworkPropertyMetadata(XmlLanguage.GetLanguage("de-DE")));
             InitializeComponent();
         }
 
@@ -97,7 +101,7 @@ namespace Projekt
         {
             OneColumnChoice oneColumnChoice = new OneColumnChoice(dataTableHelper.GetColumnsNames());
             string selectedColumn = string.Empty;
-            if(oneColumnChoice.ShowDialog() == true)
+            if (oneColumnChoice.ShowDialog() == true)
             {
                 selectedColumn = oneColumnChoice.result;
             }
@@ -358,7 +362,7 @@ namespace Projekt
             List<Range> ranges = new List<Range>();
 
             // przedział domknięty z lewej tylko dla pierwszego zakresu
-            while(minValueInRange < maxValue)
+            while (minValueInRange < maxValue)
             {
                 var count = minValueInRange == minValue
                     ? floatValues.Count(f => f >= minValueInRange && f <= maxValueInRange)
@@ -380,7 +384,7 @@ namespace Projekt
             textToWrite.Add($"{firstColumn}");
             textToWrite.Add($"{ranges.Count}");
 
-            ranges.ForEach(r => textToWrite.Add($"{string.Format("{0:0.00}",r.MinValue)}-{string.Format("{0:0.00}", r.MaxValue)} {r.Count}"));
+            ranges.ForEach(r => textToWrite.Add($"{string.Format("{0:0.00}", r.MinValue)}-{string.Format("{0:0.00}", r.MaxValue)} {r.Count}"));
 
             File.WriteAllLines($"HistogramContinuousValues_{firstColumn}_{numberOfRanges}_ranges.txt", textToWrite);
         }
@@ -405,7 +409,7 @@ namespace Projekt
             var distinctFloatValues = floatValues.Distinct();
             List<DiscreteHistogramValue> discreteValues = new List<DiscreteHistogramValue>();
 
-            foreach(var distinctValue in distinctFloatValues)
+            foreach (var distinctValue in distinctFloatValues)
             {
                 discreteValues.Add(new DiscreteHistogramValue
                 {
@@ -423,5 +427,66 @@ namespace Projekt
 
             File.WriteAllLines($"HistogramDiscreteValues_{firstColumn}.txt", textToWrite);
         }
+
+        private void Classification_Click(object sender, RoutedEventArgs e)
+        {
+            GetNumberFromUser getNumberOfColumns = new GetNumberFromUser("Enter number of columns for classification");
+
+            int numberOfColumns = 0;
+            if (getNumberOfColumns.ShowDialog() == true)
+            {
+                numberOfColumns = (int)getNumberOfColumns.result;
+            }
+
+            string[] columnNames = new string[numberOfColumns];
+            for (int i = 0; i < numberOfColumns; i++)
+            {
+                OneColumnChoice columnChoice = new OneColumnChoice(dataTableHelper.GetColumnsNames());
+                string columnName = string.Empty;
+                if (columnChoice.ShowDialog() == true)
+                {
+                    columnName = columnChoice.result;
+                }
+
+                columnNames[i] = columnName;
+            }
+
+            MessageBox.Show("Pick column containing class (must have int values)");
+            OneColumnChoice classColumnChoice = new OneColumnChoice(dataTableHelper.GetColumnsNames());
+
+            string classColumn = string.Empty;
+            if (classColumnChoice.ShowDialog() == true)
+            {
+                classColumn = classColumnChoice.result;
+            }
+
+            var classValues = dataTableHelper.GetAllValuesFromColumn(classColumn);
+            var numberOfRecords = classValues.Count;
+
+            var classificationModels = new ClassificationModel[numberOfRecords];
+
+            int index = 0;
+            foreach(var classValue in classValues)
+            {
+                classificationModels[index++] = new ClassificationModel(numberOfColumns, (int)classValue);
+            }
+
+            for (int columnIndex = 0; columnIndex < numberOfColumns; columnIndex++)
+            {
+                var columnValues = dataTableHelper.GetAllValuesFromColumn(columnNames[columnIndex]);
+                for (int recordIndex = 0; recordIndex < numberOfRecords; recordIndex++)
+                {
+                    classificationModels[recordIndex].InitialValues[columnIndex] = new InitialValue
+                    {
+                        ColumnName = columnNames[columnIndex],
+                        Value = columnValues.ElementAt(recordIndex)
+                    };
+                }
+            }
+
+            var x = 0;
+
+
+        }
     }
-} 
+}
