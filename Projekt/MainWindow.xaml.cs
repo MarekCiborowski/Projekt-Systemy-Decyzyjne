@@ -484,7 +484,9 @@ namespace Projekt
                 }
             }
 
-            var x = 0;
+            var intClassValues = classValues.Select(c => (int)c).ToArray();
+            var classificationIntersections = ClassificationHelper.Classify(classificationModels, intClassValues.Distinct().ToArray());
+
 
 
         }

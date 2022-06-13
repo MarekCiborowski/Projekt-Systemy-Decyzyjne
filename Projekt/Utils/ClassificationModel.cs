@@ -12,8 +12,6 @@ namespace Projekt.Utils
 
         public int ClassValue { get; set; }
 
-        public int[] BinaryValues { get; set; }
-
         public ClassificationModel(int numberOfColumns, int classValue)
         {
             InitialValues = new InitialValue[numberOfColumns];
