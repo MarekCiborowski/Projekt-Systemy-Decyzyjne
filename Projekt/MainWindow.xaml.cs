@@ -281,6 +281,8 @@ namespace Projekt
             secondColumnValues.ForEach(s => textToWrite.Add(s.ToString()));
 
             File.WriteAllLines($"TwoDimensionData_{firstColumn}_{secondColumn}.txt", textToWrite);
+
+            MessageBox.Show("File generated");
         }
 
         private void ExtractThreeDimensionChart_Click(object sender, RoutedEventArgs e)
@@ -324,6 +326,8 @@ namespace Projekt
             thirdColumnValues.ForEach(t => textToWrite.Add(t.ToString()));
 
             File.WriteAllLines($"ThreeDimensionData_{firstColumn}_{secondColumn}_{thirdColumn}.txt", textToWrite);
+
+            MessageBox.Show("File generated");
         }
 
         private class Range
@@ -387,6 +391,8 @@ namespace Projekt
             ranges.ForEach(r => textToWrite.Add($"{string.Format("{0:0.00}", r.MinValue)}-{string.Format("{0:0.00}", r.MaxValue)} {r.Count}"));
 
             File.WriteAllLines($"HistogramContinuousValues_{firstColumn}_{numberOfRanges}_ranges.txt", textToWrite);
+
+            MessageBox.Show("File generated");
         }
 
         private class DiscreteHistogramValue
@@ -426,6 +432,8 @@ namespace Projekt
             discreteValues.ForEach(d => textToWrite.Add($"{d.Value} {d.Count}"));
 
             File.WriteAllLines($"HistogramDiscreteValues_{firstColumn}.txt", textToWrite);
+
+            MessageBox.Show("File generated");
         }
 
         private void Classification_Click(object sender, RoutedEventArgs e)
@@ -464,8 +472,6 @@ namespace Projekt
             var numberOfRecords = classValues.Count;
             var columnValuesArray = new ColumnValues[numberOfColumns];
 
-            int index = 0;
-
             for (int columnIndex = 0; columnIndex < numberOfColumns; columnIndex++)
             {
                 var columnValues = dataTableHelper.GetAllValuesFromColumn(columnNames[columnIndex]);
@@ -489,7 +495,123 @@ namespace Projekt
 
             var intClassValues = classValues.Select(c => (int)c).ToArray();
             var classificationIntersections = ClassificationHelper.Classify(columnValuesArray, intClassValues.Distinct().ToArray());
-            var x = 0;
+            
+            foreach(var classificationIntersection in classificationIntersections)
+            {
+                classificationIntersection.IntersectionPoints 
+                    = classificationIntersection.IntersectionPoints.Distinct().OrderBy(i => i).ToList();
+            }
+
+            var numberOfHyperPlanes = 1;
+            var multiplier = 1;
+            foreach (var classificationIntersection in classificationIntersections)
+            {
+                numberOfHyperPlanes += classificationIntersection.IntersectionPoints.Count * multiplier;
+                if (classificationIntersection.IntersectionPoints.Count != 0)
+                {
+                    multiplier = numberOfHyperPlanes; 
+                }
+            }
+
+            var binaryVectorLength = numberOfHyperPlanes == 2
+                ? 1
+                : (int)Math.Ceiling(Math.Sqrt(numberOfHyperPlanes)) - 1;
+
+            var classificationResults = new ClassificationResult[numberOfRecords];
+            for(int i = 0; i< numberOfRecords; i++)
+            {
+                classificationResults[i] = new ClassificationResult();
+            }
+
+            for(int recordIndex = 0; recordIndex < numberOfRecords; recordIndex++)
+            {
+                var classValue = intClassValues[recordIndex];
+                classificationResults[recordIndex].ClassValue = classValue;
+
+                var nonBinaryCoordinates = 0;
+                foreach(var columnValue in columnValuesArray)
+                {
+                    var classificationIntersection = classificationIntersections.First(c => c.ColumnName == columnValue.ColumnName);
+                    var floatValueFromColumn = columnValue.ClassificationModels[recordIndex].ColumnValue;
+                    for(int intersectionIndex = 0; intersectionIndex < classificationIntersection.IntersectionPoints.Count;
+                        intersectionIndex++)
+                    {
+                        if(floatValueFromColumn >= classificationIntersection.IntersectionPoints[intersectionIndex])
+                        {
+                            nonBinaryCoordinates++;
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                }
+                var binaryCoordinates = Convert.ToString(nonBinaryCoordinates, 2);
+                var binaryBuilder = new StringBuilder();
+
+                for(int i = 0; i < binaryVectorLength - binaryCoordinates.Length; i++)
+                {
+                    binaryBuilder.Append("0");
+                }
+                binaryBuilder.Append(binaryCoordinates);
+
+                classificationResults[recordIndex].BinaryCoordinates = string.Join(' ', binaryBuilder.ToString().ToArray());
+            }
+
+            var classificationTextToWrite = new List<string>();
+            classificationTextToWrite.Add(intClassValues.Distinct().Count().ToString());
+            classificationTextToWrite.Add(binaryVectorLength.ToString());
+            foreach(var classificationResult in classificationResults)
+            {
+                classificationTextToWrite.Add($"{classificationResult.ClassValue};{classificationResult.BinaryCoordinates}");
+            }
+
+            File.WriteAllLines("ClassificationResult.txt", classificationTextToWrite);
+            MessageBox.Show("Classification file saved");
+
+            if (numberOfColumns == 2)
+            {
+                var firstColumnValues = columnValuesArray[0].ClassificationModels;
+                var secondColumnValues = columnValuesArray[1].ClassificationModels;
+
+                var textToWrite = new List<string>();
+
+                textToWrite.Add($"{firstColumnValues.Count()}");
+
+                textToWrite.Add($"{columnValuesArray[0].ColumnName}");
+                foreach(var firstColumnValue in firstColumnValues)
+                {
+                    textToWrite.Add(firstColumnValue.ColumnValue.ToString());
+                }
+
+                textToWrite.Add($"{columnValuesArray[1].ColumnName}");
+                foreach (var secondColumnValue in secondColumnValues)
+                {
+                    textToWrite.Add(secondColumnValue.ColumnValue.ToString());
+                }
+
+                textToWrite.Add("Classes");
+                foreach (var secondColumnValue in secondColumnValues)
+                {
+                    textToWrite.Add(secondColumnValue.ClassValue.ToString());
+                }
+
+                textToWrite.Add("First Column Intersections");
+                foreach (var firstColumnIntersection in classificationIntersections[0].IntersectionPoints)
+                {
+                    textToWrite.Add(firstColumnIntersection.ToString());
+                }
+
+                textToWrite.Add("Second Column Intersections");
+                foreach (var secondColumnIntersection in classificationIntersections[1].IntersectionPoints)
+                {
+                    textToWrite.Add(secondColumnIntersection.ToString());
+                }
+
+                File.WriteAllLines($"ClassificationDataForChart.txt", textToWrite);
+
+                MessageBox.Show("File for classification chart saved");
+            }
 
 
         }
