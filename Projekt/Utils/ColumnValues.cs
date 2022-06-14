@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace Projekt.Utils
 {
-    public class ClassificationIntersections
+    public class ColumnValues
     {
         public string ColumnName { get; set; }
 
-        public List<float> IntersectionPoints { get; set; } = new List<float>();
+        public ClassificationModel[] ClassificationModels { get; set; }
     }
 }

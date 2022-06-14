@@ -462,31 +462,34 @@ namespace Projekt
 
             var classValues = dataTableHelper.GetAllValuesFromColumn(classColumn);
             var numberOfRecords = classValues.Count;
-
-            var classificationModels = new ClassificationModel[numberOfRecords];
+            var columnValuesArray = new ColumnValues[numberOfColumns];
 
             int index = 0;
-            foreach(var classValue in classValues)
-            {
-                classificationModels[index++] = new ClassificationModel(numberOfColumns, (int)classValue);
-            }
 
             for (int columnIndex = 0; columnIndex < numberOfColumns; columnIndex++)
             {
                 var columnValues = dataTableHelper.GetAllValuesFromColumn(columnNames[columnIndex]);
+                var columnValuesElementInArray = new ColumnValues
+                {
+                    ClassificationModels = new ClassificationModel[numberOfRecords],
+                    ColumnName = columnNames[columnIndex]
+                };
+
                 for (int recordIndex = 0; recordIndex < numberOfRecords; recordIndex++)
                 {
-                    classificationModels[recordIndex].InitialValues[columnIndex] = new InitialValue
+                    columnValuesElementInArray.ClassificationModels[recordIndex] = new ClassificationModel
                     {
-                        ColumnName = columnNames[columnIndex],
-                        Value = columnValues.ElementAt(recordIndex)
+                        ColumnValue = columnValues[recordIndex],
+                        ClassValue = (int)classValues[recordIndex]
                     };
                 }
+
+                columnValuesArray[columnIndex] = columnValuesElementInArray;
             }
 
             var intClassValues = classValues.Select(c => (int)c).ToArray();
-            var classificationIntersections = ClassificationHelper.Classify(classificationModels, intClassValues.Distinct().ToArray());
-
+            var classificationIntersections = ClassificationHelper.Classify(columnValuesArray, intClassValues.Distinct().ToArray());
+            var x = 0;
 
 
         }

@@ -8,14 +8,8 @@ namespace Projekt.Utils
 {
     public class ClassificationModel
     {
-        public InitialValue[] InitialValues { get; set; }
+        public float ColumnValue { get; set; }
 
         public int ClassValue { get; set; }
-
-        public ClassificationModel(int numberOfColumns, int classValue)
-        {
-            InitialValues = new InitialValue[numberOfColumns];
-            ClassValue = classValue;
-        }
     }
 }
