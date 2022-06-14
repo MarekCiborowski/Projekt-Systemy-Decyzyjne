@@ -12,18 +12,18 @@
         <TextBox Name="FilePathTextBox" HorizontalAlignment="Left" Margin="231,12,0,0" VerticalAlignment="Top" Width="323" />
 
         <StackPanel Margin="1204,74,490,0">
-            <Button Content="Change text to number" Click="ChangeTextToNumber_Click"/>
-            <Button Content="Discretize column" Click="Discretize_Click"/>
-            <Button Content="Standardize column" Click="Standardize_Click"/>
-            <Button Content="Scale range of column" Click="ScaleRange_Click"/>
-            <Button Content="Extract percentage of minimal values" Click="MinimalValues_Click"/>
-            <Button Content="Extract percentage of maximum values" Click="MaximumValues_Click"/>
-            <Button Content="Extract file for 2D chart" Click="ExtractTwoDimensionChart_Click"/>
-            <Button Content="Extract file for 3D chart" Click="ExtractThreeDimensionChart_Click"/>
-            <Button Content="Extract file for histogram (continous)" Click="ExtractHistogramContinuous_Click"/>
-            <Button Content="Extract file for histogram (discrete)" Click="ExtractHistogramDiscrete_Click"/>
+            <Button Margin = "3" Content="Change text to number" Click="ChangeTextToNumber_Click"/>
+            <Button Margin = "3" Content="Discretize column" Click="Discretize_Click"/>
+            <Button Margin = "3" Content="Standardize column" Click="Standardize_Click"/>
+            <Button Margin = "3" Content="Scale range of column" Click="ScaleRange_Click"/>
+            <Button Margin = "3" Content="Extract percentage of minimal values" Click="MinimalValues_Click"/>
+            <Button Margin = "3" Content="Extract percentage of maximum values" Click="MaximumValues_Click"/>
+            <Button Margin = "3" Content="Extract file for 2D chart" Click="ExtractTwoDimensionChart_Click"/>
+            <Button Margin = "3" Content="Extract file for 3D chart" Click="ExtractThreeDimensionChart_Click"/>
+            <Button Margin = "3" Content="Extract file for histogram (continous)" Click="ExtractHistogramContinuous_Click"/>
+            <Button Margin = "3" Content="Extract file for histogram (discrete)" Click="ExtractHistogramDiscrete_Click"/>
 
-            <Button Content="Classification" Click="Classification_Click"/>
+            <Button Margin = "3" Content="Classification" Click="Classification_Click"/>
         </StackPanel>
     </Grid>
 </Window>

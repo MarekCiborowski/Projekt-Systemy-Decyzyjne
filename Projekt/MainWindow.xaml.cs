@@ -275,12 +275,12 @@ namespace Projekt
             textToWrite.Add($"{firstColumnValues.Count}");
 
             textToWrite.Add($"{firstColumn}");
-            firstColumnValues.ForEach(f => textToWrite.Add(f.ToString()));
+            firstColumnValues.ForEach(f => textToWrite.Add(string.Format("{0:0.00}", f).Replace(',', '.')));
 
             textToWrite.Add($"{secondColumn}");
-            secondColumnValues.ForEach(s => textToWrite.Add(s.ToString()));
+            secondColumnValues.ForEach(s => textToWrite.Add(string.Format("{0:0.00}", s).Replace(',', '.')));
 
-            File.WriteAllLines($"TwoDimensionData_{firstColumn}_{secondColumn}.txt", textToWrite);
+            File.WriteAllLines($"TwoDimensionData.txt", textToWrite);
 
             MessageBox.Show("File generated");
         }
@@ -317,15 +317,15 @@ namespace Projekt
             textToWrite.Add($"{firstColumnValues.Count}");
 
             textToWrite.Add($"{firstColumn}");
-            firstColumnValues.ForEach(f => textToWrite.Add(f.ToString()));
+            firstColumnValues.ForEach(f => textToWrite.Add(string.Format("{0:0.00}", f).Replace(',', '.')));
 
             textToWrite.Add($"{secondColumn}");
-            secondColumnValues.ForEach(s => textToWrite.Add(s.ToString()));
+            secondColumnValues.ForEach(s => textToWrite.Add(string.Format("{0:0.00}", s).Replace(',', '.')));
 
             textToWrite.Add($"{thirdColumn}");
-            thirdColumnValues.ForEach(t => textToWrite.Add(t.ToString()));
+            thirdColumnValues.ForEach(t => textToWrite.Add(string.Format("{0:0.00}", t).Replace(',', '.')));
 
-            File.WriteAllLines($"ThreeDimensionData_{firstColumn}_{secondColumn}_{thirdColumn}.txt", textToWrite);
+            File.WriteAllLines($"ThreeDimensionData.txt", textToWrite);
 
             MessageBox.Show("File generated");
         }
@@ -368,7 +368,7 @@ namespace Projekt
             // przedział domknięty z lewej tylko dla pierwszego zakresu
             while (minValueInRange < maxValue)
             {
-                var count = minValueInRange == minValue
+                var count = minValueInRange == minValue || maxValueInRange == maxValue
                     ? floatValues.Count(f => f >= minValueInRange && f <= maxValueInRange)
                     : floatValues.Count(f => f > minValueInRange && f <= maxValueInRange);
 
@@ -388,9 +388,10 @@ namespace Projekt
             textToWrite.Add($"{firstColumn}");
             textToWrite.Add($"{ranges.Count}");
 
-            ranges.ForEach(r => textToWrite.Add($"{string.Format("{0:0.00}", r.MinValue)}-{string.Format("{0:0.00}", r.MaxValue)} {r.Count}"));
+            ranges.ForEach(r => textToWrite.Add($"{string.Format("{0:0.00}", r.MinValue).Replace(',', '.')}" +
+                $"-{string.Format("{0:0.00}", r.MaxValue).Replace(',', '.')} {r.Count}"));
 
-            File.WriteAllLines($"HistogramContinuousValues_{firstColumn}_{numberOfRanges}_ranges.txt", textToWrite);
+            File.WriteAllLines($"HistogramContinuousValues.txt", textToWrite);
 
             MessageBox.Show("File generated");
         }
@@ -429,9 +430,9 @@ namespace Projekt
             textToWrite.Add($"{firstColumn}");
             textToWrite.Add($"{discreteValues.Count}");
 
-            discreteValues.ForEach(d => textToWrite.Add($"{d.Value} {d.Count}"));
+            discreteValues.ForEach(d => textToWrite.Add($"{string.Format("{0:0.00}", d.Value).Replace(',', '.')} {d.Count}"));
 
-            File.WriteAllLines($"HistogramDiscreteValues_{firstColumn}.txt", textToWrite);
+            File.WriteAllLines($"HistogramDiscreteValues.txt", textToWrite);
 
             MessageBox.Show("File generated");
         }
@@ -515,7 +516,7 @@ namespace Projekt
 
             var binaryVectorLength = numberOfHyperPlanes == 2
                 ? 1
-                : (int)Math.Ceiling(Math.Sqrt(numberOfHyperPlanes)) - 1;
+                : (int)Math.Ceiling(Math.Sqrt(numberOfHyperPlanes));
 
             var classificationResults = new ClassificationResult[numberOfRecords];
             for(int i = 0; i< numberOfRecords; i++)
@@ -531,14 +532,16 @@ namespace Projekt
                 var nonBinaryCoordinates = 0;
                 foreach(var columnValue in columnValuesArray)
                 {
+                    var coordinatesMultiplier = nonBinaryCoordinates + 1;
                     var classificationIntersection = classificationIntersections.First(c => c.ColumnName == columnValue.ColumnName);
                     var floatValueFromColumn = columnValue.ClassificationModels[recordIndex].ColumnValue;
+
                     for(int intersectionIndex = 0; intersectionIndex < classificationIntersection.IntersectionPoints.Count;
                         intersectionIndex++)
                     {
                         if(floatValueFromColumn >= classificationIntersection.IntersectionPoints[intersectionIndex])
                         {
-                            nonBinaryCoordinates++;
+                            nonBinaryCoordinates += 1*coordinatesMultiplier;
                         }
                         else
                         {
@@ -581,14 +584,17 @@ namespace Projekt
                 textToWrite.Add($"{columnValuesArray[0].ColumnName}");
                 foreach(var firstColumnValue in firstColumnValues)
                 {
-                    textToWrite.Add(firstColumnValue.ColumnValue.ToString());
+                    textToWrite.Add(string.Format("{0:0.00}", firstColumnValue.ColumnValue).Replace(',','.'));
                 }
 
                 textToWrite.Add($"{columnValuesArray[1].ColumnName}");
                 foreach (var secondColumnValue in secondColumnValues)
                 {
-                    textToWrite.Add(secondColumnValue.ColumnValue.ToString());
+                    textToWrite.Add(string.Format("{0:0.00}", secondColumnValue.ColumnValue).Replace(',', '.'));
                 }
+
+                textToWrite.Add("Number of classes");
+                textToWrite.Add(intClassValues.Distinct().Count().ToString());
 
                 textToWrite.Add("Classes");
                 foreach (var secondColumnValue in secondColumnValues)
@@ -599,13 +605,13 @@ namespace Projekt
                 textToWrite.Add("First Column Intersections");
                 foreach (var firstColumnIntersection in classificationIntersections[0].IntersectionPoints)
                 {
-                    textToWrite.Add(firstColumnIntersection.ToString());
+                    textToWrite.Add(string.Format("{0:0.00}", firstColumnIntersection).Replace(',', '.'));
                 }
 
                 textToWrite.Add("Second Column Intersections");
                 foreach (var secondColumnIntersection in classificationIntersections[1].IntersectionPoints)
                 {
-                    textToWrite.Add(secondColumnIntersection.ToString());
+                    textToWrite.Add(string.Format("{0:0.00}", secondColumnIntersection).Replace(',', '.'));
                 }
 
                 File.WriteAllLines($"ClassificationDataForChart.txt", textToWrite);
