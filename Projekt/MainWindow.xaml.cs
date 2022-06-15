@@ -581,26 +581,16 @@ namespace Projekt
 
                 textToWrite.Add($"{firstColumnValues.Count()}");
 
-                textToWrite.Add($"{columnValuesArray[0].ColumnName}");
-                foreach(var firstColumnValue in firstColumnValues)
+                textToWrite.Add($"{columnValuesArray[0].ColumnName},{columnValuesArray[1].ColumnName},classes");
+                for (int i = 0; i < numberOfRecords; i++)
                 {
-                    textToWrite.Add(string.Format("{0:0.00}", firstColumnValue.ColumnValue).Replace(',','.'));
-                }
-
-                textToWrite.Add($"{columnValuesArray[1].ColumnName}");
-                foreach (var secondColumnValue in secondColumnValues)
-                {
-                    textToWrite.Add(string.Format("{0:0.00}", secondColumnValue.ColumnValue).Replace(',', '.'));
+                    textToWrite.Add($"{string.Format("{0:0.00}", firstColumnValues[i].ColumnValue).Replace(',', '.')}," +
+                        $"{string.Format("{0:0.00}", secondColumnValues[i].ColumnValue).Replace(',', '.')}," +
+                        $"{secondColumnValues[i].ClassValue}");
                 }
 
                 textToWrite.Add("Number of classes");
                 textToWrite.Add(intClassValues.Distinct().Count().ToString());
-
-                textToWrite.Add("Classes");
-                foreach (var secondColumnValue in secondColumnValues)
-                {
-                    textToWrite.Add(secondColumnValue.ClassValue.ToString());
-                }
 
                 textToWrite.Add("First Column Intersections");
                 foreach (var firstColumnIntersection in classificationIntersections[0].IntersectionPoints)
