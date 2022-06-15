@@ -558,15 +558,25 @@ namespace Projekt
                 }
                 binaryBuilder.Append(binaryCoordinates);
 
-                classificationResults[recordIndex].BinaryCoordinates = string.Join(' ', binaryBuilder.ToString().ToArray());
+                classificationResults[recordIndex].BinaryCoordinates = string.Join(',', binaryBuilder.ToString().ToArray());
             }
 
             var classificationTextToWrite = new List<string>();
-            classificationTextToWrite.Add(intClassValues.Distinct().Count().ToString());
-            classificationTextToWrite.Add(binaryVectorLength.ToString());
+            classificationTextToWrite.Add("@RELATION test");
+
+            for(int i = 0; i< binaryVectorLength; i++)
+            {
+                classificationTextToWrite.Add($"@ATTRIBUTE Column{i+1} NUMERIC");
+            }
+
+            var classesString = "{" + string.Join(',', intClassValues.Distinct()) + "}";
+            classificationTextToWrite.Add($"@ATTRIBUTE class {classesString}");
+            classificationTextToWrite.Add(string.Empty);
+            classificationTextToWrite.Add("@DATA");
+
             foreach(var classificationResult in classificationResults)
             {
-                classificationTextToWrite.Add($"{classificationResult.ClassValue};{classificationResult.BinaryCoordinates}");
+                classificationTextToWrite.Add($"{classificationResult.BinaryCoordinates},{classificationResult.ClassValue}");
             }
 
             File.WriteAllLines("ClassificationResult.txt", classificationTextToWrite);
